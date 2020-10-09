@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { createLogger } from './utils/logger';
+import { IndexRouter } from './controllers/v1/index.router';
 
 const logger = createLogger('Root');
 
@@ -15,6 +16,8 @@ const logger = createLogger('Root');
     logger.info('connected with browser');
     res.status(200).send('Welcome to the ShrotUrl App');
   });
+
+  app.use('/api/v1/', IndexRouter);
 
   // Start the Server
   app.listen(port, () => {
