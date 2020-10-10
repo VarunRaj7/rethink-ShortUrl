@@ -1,19 +1,28 @@
+declare const process: {
+  env: {
+    SHORT_URL_TABLE: string;
+    ACTUAL_URL_INDEX: string;
+    USER_INDEX: string;
+    AWS_REGION: string;
+    AWS_PROFILE: string;
+    BASE_URL: string;
+  };
+};
 export const config = {
-  /* Deveopment Environment Variables
+  /* Deveopment Environment Variables  */
   dev: {
-    username: process.env.POSTGRESS_USERNAME,
-    password: process.env.POSTGRESS_PASSWORD,
-    database: process.env.POSTGRESS_DATABASE,
-    host: process.env.POSTGRESS_HOST,
-    dialect: 'postgres',
+    shortUrl_table: process.env.SHORT_URL_TABLE,
+    actualUrl_index: process.env.ACTUAL_URL_INDEX,
+    user_index: process.env.USER_INDEX,
     aws_region: process.env.AWS_REGION,
     aws_profile: process.env.AWS_PROFILE,
-    aws_media_bucket: process.env.AWS_MEDIA_BUCKET,
+    base_url: process.env.BASE_URL,
   },
-  */
+  /*
   jwt: {
     secret: process.env.JWT_SECRET,
   },
+  */
   /* Production environment Variables 
   prod: {
     username: '',
