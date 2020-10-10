@@ -94,6 +94,7 @@ router.get('/actualUrl/', async (req: Request, res: Response) => {
 });
 
 // Delete short URL
+/*
 router.delete('/shortUrl/', async (req: Request, res: Response) => {
   const { shortUrl } = req.body;
 
@@ -110,6 +111,7 @@ router.delete('/shortUrl/', async (req: Request, res: Response) => {
     .then(() => res.status(200).send(`Successfully Deleted ${shortUrl}`))
     .catch((e) => res.status(400).send(`Failed to delete retry: ${e}`));
 });
+*/
 
 // Fetch the latest 10 urls created by user
 
