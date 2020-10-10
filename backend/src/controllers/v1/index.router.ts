@@ -98,7 +98,7 @@ router.get('/actualUrl/:shortUrl', async (req: Request, res: Response) => {
       },
     })
     .promise()
-    .then((result) => res.status(200).send(JSON.stringify(result)))
+    .then((result) => res.status(200).send(JSON.stringify(result.Item)))
     .catch((e) => res.status(400).send(`Failed to fetch retry: ${e}`));
 });
 
