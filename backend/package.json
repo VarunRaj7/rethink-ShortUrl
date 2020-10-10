@@ -1,5 +1,5 @@
 {
-  "name": "rethink-ShortUrl",
+  "name": "rethink-shorturl",
   "version": "1.0.0",
   "description": "Rethink ShortURL",
   "main": "server.js",
