@@ -20,16 +20,22 @@ const router: Router = Router();
 
 // Get ShortURL given actual URL
 router.get('/shortUrl/:actualUrl', async (req: Request, res: Response) => {
-  const actualUrl = decodeURI(req.params.actualUrl).toString();
+  const actualUrl = decodeURI(req.params.actualUrl)
+    .toString()
+    .replace(/\/$/, '');
+
+  const user = 'Varun';
 
   logger.info(`ShortURL for ${actualUrl}`);
+
+  logger.info(`Checking if it is  valid url ${isUrl(actualUrl)}`);
   // Checking if the given string is a url
   if (!isUrl(actualUrl) || actualUrl === 'undefined') {
     res.status(400).send(`Not a Valid URL`);
     return res;
   }
 
-  if (await actualUrlExists(actualUrl, docClient)) {
+  if (await actualUrlExists(actualUrl, user, docClient)) {
     // Verifying if the URL exists in dynamodb
 
     const id = nanoid();
@@ -41,7 +47,7 @@ router.get('/shortUrl/:actualUrl', async (req: Request, res: Response) => {
 
     // If the URL not exists create a new short URL
     const newItem: shortUrlModel = {
-      actualUrl: actualUrl.replace(/\/$/, ''),
+      actualUrl: actualUrl,
       shortUrl: ShortUrl,
       user: 'Varun',
       createdAt: new Date().toISOString(),
