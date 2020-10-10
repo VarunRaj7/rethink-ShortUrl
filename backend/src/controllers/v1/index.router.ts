@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { customAlphabet } from 'nanoid';
+import isUrl from 'is-url';
 import { createDynamoDBClient, actualUrlExists } from './dataUtils';
 import { config } from '../../config/config';
 import { createLogger } from '../../utils/logger';
@@ -21,9 +22,14 @@ const router: Router = Router();
 router.get('/shortUrl/', async (req: Request, res: Response) => {
   const actualUrl = req.body.actualUrl.replace(/\/$/, '');
 
-  // Verifying if the URL exists
+  // Checking if the given string is a url
+  if (!isUrl(actualUrl)) {
+    res.status(400).send(`Not a Valid URL`);
+  }
 
   if (await actualUrlExists(actualUrl, docClient)) {
+    // Verifying if the URL exists in dynamodb
+
     const id = nanoid();
 
     const ShortUrl = c.base_url + id;
