@@ -1,7 +1,7 @@
 {
-  "name": "ant-backend",
+  "name": "rethink-ShortUrl",
   "version": "1.0.0",
-  "description": "ANT project",
+  "description": "Rethink ShortURL",
   "main": "server.js",
   "scripts": {
     "start": "node .",
@@ -11,7 +11,7 @@
     "build": "npm run clean && tsc && cp -rf src/config www/ && cp .npmrc www/.npmrc && cp package.json www/package.json && cd www && zip -r Archive.zip . && cd ..",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "ANT Backend Team: Varun Raj Rayabarapu",
+  "author": "Varun Raj Rayabarapu",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.758.0",
