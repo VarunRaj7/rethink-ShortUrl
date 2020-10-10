@@ -44,25 +44,29 @@ router.get('/shortUrl/', async (req: Request, res: Response) => {
     docClient
       .put({ TableName: c.shortUrl_table, Item: newItem })
       .promise()
-      .then((result) => res.status(200).send(JSON.stringify(result)))
+      .then(() => res.status(200).send(JSON.stringify(newItem)))
       .catch((e) => res.status(400).send(`Failed to Create retry: ${e}`));
+  } else {
+    // Verifying if the URL exists
+    // send the Short URL
+    logger.info(`ShortURL exists for ${actualUrl}`);
+    docClient
+      .query({
+        TableName: c.shortUrl_table,
+        IndexName: c.actualUrl_index,
+        KeyConditionExpression: 'actualUrl = :actualUrl',
+        ExpressionAttributeValues: {
+          ':actualUrl': actualUrl,
+        },
+      })
+      .promise()
+      .then((result) => {
+        if (result.Items !== undefined) {
+          res.status(200).send(JSON.stringify(result.Items[0]));
+        }
+      })
+      .catch((e) => res.status(400).send(`Failed to fetch retry: ${e}`));
   }
-
-  // Verifying if the URL exists
-  // senf the Short URL
-  logger.info(`ShortURL exists for ${actualUrl}`);
-  docClient
-    .query({
-      TableName: c.shortUrl_table,
-      IndexName: c.actualUrl_index,
-      KeyConditionExpression: 'actualUrl = :actualUrl',
-      ExpressionAttributeValues: {
-        ':actualUrl': actualUrl,
-      },
-    })
-    .promise()
-    .then((result) => res.status(200).send(JSON.stringify(result)))
-    .catch((e) => res.status(400).send(`Failed to fetch retry: ${e}`));
 });
 
 // Get actual URL given short URL
@@ -99,6 +103,32 @@ router.delete('/shortUrl/', async (req: Request, res: Response) => {
     .promise()
     .then(() => res.status(200).send(`Successfully Deleted ${shortUrl}`))
     .catch((e) => res.status(400).send(`Failed to delete retry: ${e}`));
+});
+
+// Fetch the latest 10 urls created by user
+
+router.get('/user/', async (req: Request, res: Response) => {
+  const user = 'Varun';
+
+  // Fecthing the last 10 urls created by user
+  logger.info(`ShortURL exists for ${user}`);
+
+  docClient
+    .scan({
+      TableName: c.shortUrl_table,
+      IndexName: c.user_index,
+      FilterExpression: '#user = :user',
+      ExpressionAttributeValues: {
+        ':user': user,
+      },
+      ExpressionAttributeNames: {
+        '#user': 'user',
+      },
+      Limit: 10,
+    })
+    .promise()
+    .then((result) => res.status(200).send(JSON.stringify(result)))
+    .catch((e) => res.status(400).send(`Failed to fetch retry: ${e}`));
 });
 
 export const IndexRouter: Router = router;

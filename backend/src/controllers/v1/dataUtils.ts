@@ -33,7 +33,7 @@ async function actualUrlExists(actualUrl: string, docClient: DocumentClient) {
 
   logger.info(`${JSON.stringify(result)}`);
 
-  return JSON.stringify(result) === '{}';
+  return result.Count === 0;
 }
 
 export { createDynamoDBClient, actualUrlExists };
