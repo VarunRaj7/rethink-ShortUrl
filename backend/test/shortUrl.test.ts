@@ -1,32 +1,36 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import isUrl from 'is-url';
-import Axios from 'axios';
+import Axios, { AxiosResponse } from 'axios';
 import { shortUrlModel } from '../src/controllers/v1/shortUrl.model';
+import { createLogger } from '../src/utils/logger';
 
-describe('GET API for the /shortUrl/', async () => {
+const logger = createLogger('testing');
+
+describe('GET API for the /shortUrl/', () => {
   const google = 'https://www.google.com/';
-  const res = await Axios.get('http://localhost:8080/api/v1/shortUrl/', {
-    data: { actualUrl: google },
-  });
-  it(' should return a 200 status for http://www.google.com', () => {
-    expect(res.status).to.be.equal(200);
-  });
-  it(' should return a valid url for http://www.google.com', () => {
-    const body: shortUrlModel = JSON.parse(res.data);
-    const validUrl = isUrl(body.shortUrl);
-    expect(validUrl).to.be.true;
-  });
-  it(' should return a 400 for http://google.fsk', () => {
-    expect(res.status).to.be.equal(400);
-  });
+  Axios.get(`http://localhost:8080/api/v1/shortUrl/${encodeURI(google)}`)
+    .then((response) => {
+      it(' should return a 200 status for http://www.google.com', () => {
+        expect(response.status).to.be.equal(200);
+      });
+      it(' should return a valid url for http://www.google.com', () => {
+        const body: shortUrlModel = JSON.parse(response.data);
+        const validUrl = isUrl(body.shortUrl);
+        expect(validUrl).to.be.true;
+      });
+      it(' should return a 400 for http://google.fsk', () => {
+        expect(response.status).to.be.equal(400);
+      });
+    })
+    .catch((e) => logger.error(`Failed to create the short url ${e}`));
 });
 
 describe('GET API for the /actualUrl/', async () => {
   const google = 'https://www.google.com/';
-  const res = await Axios.get('http://localhost:8080/api/v1/actualUrl/', {
-    data: { actualUrl: google },
-  });
+  const res = await Axios.get(
+    `http://localhost:8080/api/v1/shortUrl/${encodeURI(google)}`
+  );
   const body: shortUrlModel = JSON.parse(res.data);
   it(` should return a 200 status for ${body.shortUrl} which is google short url`, () => {
     expect(res.status).to.be.equal(200);

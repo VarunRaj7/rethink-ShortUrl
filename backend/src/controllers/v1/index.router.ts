@@ -19,12 +19,14 @@ const docClient = createDynamoDBClient();
 const router: Router = Router();
 
 // Get ShortURL given actual URL
-router.get('/shortUrl/', async (req: Request, res: Response) => {
-  const actualUrl = req.body.actualUrl.replace(/\/$/, '');
+router.get('/shortUrl/:actualUrl', async (req: Request, res: Response) => {
+  const actualUrl = decodeURI(req.params.actualUrl).toString();
 
+  logger.info(`ShortURL for ${actualUrl}`);
   // Checking if the given string is a url
-  if (!isUrl(actualUrl)) {
+  if (!isUrl(actualUrl) || actualUrl === 'undefined') {
     res.status(400).send(`Not a Valid URL`);
+    return res;
   }
 
   if (await actualUrlExists(actualUrl, docClient)) {
@@ -39,7 +41,7 @@ router.get('/shortUrl/', async (req: Request, res: Response) => {
 
     // If the URL not exists create a new short URL
     const newItem: shortUrlModel = {
-      actualUrl: actualUrl,
+      actualUrl: actualUrl.replace(/\/$/, ''),
       shortUrl: ShortUrl,
       user: 'Varun',
       createdAt: new Date().toISOString(),
@@ -52,32 +54,33 @@ router.get('/shortUrl/', async (req: Request, res: Response) => {
       .promise()
       .then(() => res.status(200).send(JSON.stringify(newItem)))
       .catch((e) => res.status(400).send(`Failed to Create retry: ${e}`));
-  } else {
-    // Verifying if the URL exists
-    // send the Short URL
-    logger.info(`ShortURL exists for ${actualUrl}`);
-    docClient
-      .query({
-        TableName: c.shortUrl_table,
-        IndexName: c.actualUrl_index,
-        KeyConditionExpression: 'actualUrl = :actualUrl',
-        ExpressionAttributeValues: {
-          ':actualUrl': actualUrl,
-        },
-      })
-      .promise()
-      .then((result) => {
-        if (result.Items !== undefined) {
-          res.status(200).send(JSON.stringify(result.Items[0]));
-        }
-      })
-      .catch((e) => res.status(400).send(`Failed to fetch retry: ${e}`));
+    return res;
   }
+  // Verifying if the URL exists
+  // send the Short URL
+  logger.info(`ShortURL exists for ${actualUrl}`);
+  docClient
+    .query({
+      TableName: c.shortUrl_table,
+      IndexName: c.actualUrl_index,
+      KeyConditionExpression: 'actualUrl = :actualUrl',
+      ExpressionAttributeValues: {
+        ':actualUrl': actualUrl,
+      },
+    })
+    .promise()
+    .then((result) => {
+      if (result.Items !== undefined) {
+        res.status(200).send(JSON.stringify(result.Items[0]));
+      }
+    })
+    .catch((e) => res.status(400).send(`Failed to fetch retry: ${e}`));
+  return res;
 });
 
 // Get actual URL given short URL
-router.get('/actualUrl/', async (req: Request, res: Response) => {
-  const { shortUrl } = req.body;
+router.get('/actualUrl/:shortUrl', async (req: Request, res: Response) => {
+  const shortUrl = decodeURI(req.params.shortUrl).toString();
 
   logger.info(`Retrieving Actual URL for ${shortUrl}`);
 
