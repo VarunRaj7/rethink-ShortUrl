@@ -131,7 +131,7 @@ router.get('/user/', async (req: Request, res: Response) => {
   logger.info(`ShortURL exists for ${user}`);
 
   docClient
-    .scan({
+    .query({
       TableName: c.shortUrl_table,
       IndexName: c.user_index,
       FilterExpression: '#user = :user',
@@ -142,6 +142,7 @@ router.get('/user/', async (req: Request, res: Response) => {
         '#user': 'user',
       },
       Limit: 10,
+      ScanIndexForward: false,
     })
     .promise()
     .then((result) => res.status(200).send(JSON.stringify(result)))
