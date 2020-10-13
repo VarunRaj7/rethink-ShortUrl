@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { customAlphabet } from 'nanoid';
+import isUrl from 'is-url';
 import { createDynamoDBClient, actualUrlExists } from './dataUtils';
 import { config } from '../../config/config';
 import { createLogger } from '../../utils/logger';
@@ -18,12 +19,25 @@ const docClient = createDynamoDBClient();
 const router: Router = Router();
 
 // Get ShortURL given actual URL
-router.get('/shortUrl/', async (req: Request, res: Response) => {
-  const actualUrl = req.body.actualUrl.replace(/\/$/, '');
+router.get('/shortUrl/:actualUrl', async (req: Request, res: Response) => {
+  const actualUrl = decodeURI(req.params.actualUrl)
+    .toString()
+    .replace(/\/$/, '');
 
-  // Verifying if the URL exists
+  const user = 'Varun';
 
-  if (await actualUrlExists(actualUrl, docClient)) {
+  logger.info(`ShortURL for ${actualUrl}`);
+
+  logger.info(`Checking if it is  valid url ${isUrl(actualUrl)}`);
+  // Checking if the given string is a url
+  if (!isUrl(actualUrl) || actualUrl === 'undefined') {
+    res.status(400).send(`Not a Valid URL`);
+    return res;
+  }
+
+  if (await actualUrlExists(actualUrl, user, docClient)) {
+    // Verifying if the URL exists in dynamodb
+
     const id = nanoid();
 
     const ShortUrl = c.base_url + id;
@@ -46,32 +60,33 @@ router.get('/shortUrl/', async (req: Request, res: Response) => {
       .promise()
       .then(() => res.status(200).send(JSON.stringify(newItem)))
       .catch((e) => res.status(400).send(`Failed to Create retry: ${e}`));
-  } else {
-    // Verifying if the URL exists
-    // send the Short URL
-    logger.info(`ShortURL exists for ${actualUrl}`);
-    docClient
-      .query({
-        TableName: c.shortUrl_table,
-        IndexName: c.actualUrl_index,
-        KeyConditionExpression: 'actualUrl = :actualUrl',
-        ExpressionAttributeValues: {
-          ':actualUrl': actualUrl,
-        },
-      })
-      .promise()
-      .then((result) => {
-        if (result.Items !== undefined) {
-          res.status(200).send(JSON.stringify(result.Items[0]));
-        }
-      })
-      .catch((e) => res.status(400).send(`Failed to fetch retry: ${e}`));
+    return res;
   }
+  // Verifying if the URL exists
+  // send the Short URL
+  logger.info(`ShortURL exists for ${actualUrl}`);
+  docClient
+    .query({
+      TableName: c.shortUrl_table,
+      IndexName: c.actualUrl_index,
+      KeyConditionExpression: 'actualUrl = :actualUrl',
+      ExpressionAttributeValues: {
+        ':actualUrl': actualUrl,
+      },
+    })
+    .promise()
+    .then((result) => {
+      if (result.Items !== undefined) {
+        res.status(200).send(JSON.stringify(result.Items[0]));
+      }
+    })
+    .catch((e) => res.status(400).send(`Failed to fetch retry: ${e}`));
+  return res;
 });
 
 // Get actual URL given short URL
-router.get('/actualUrl/', async (req: Request, res: Response) => {
-  const { shortUrl } = req.body;
+router.get('/actualUrl/:shortUrl', async (req: Request, res: Response) => {
+  const shortUrl = decodeURI(req.params.shortUrl).toString();
 
   logger.info(`Retrieving Actual URL for ${shortUrl}`);
 
@@ -83,11 +98,12 @@ router.get('/actualUrl/', async (req: Request, res: Response) => {
       },
     })
     .promise()
-    .then((result) => res.status(200).send(JSON.stringify(result)))
+    .then((result) => res.status(200).send(JSON.stringify(result.Item)))
     .catch((e) => res.status(400).send(`Failed to fetch retry: ${e}`));
 });
 
 // Delete short URL
+/*
 router.delete('/shortUrl/', async (req: Request, res: Response) => {
   const { shortUrl } = req.body;
 
@@ -104,6 +120,7 @@ router.delete('/shortUrl/', async (req: Request, res: Response) => {
     .then(() => res.status(200).send(`Successfully Deleted ${shortUrl}`))
     .catch((e) => res.status(400).send(`Failed to delete retry: ${e}`));
 });
+*/
 
 // Fetch the latest 10 urls created by user
 
@@ -114,7 +131,7 @@ router.get('/user/', async (req: Request, res: Response) => {
   logger.info(`ShortURL exists for ${user}`);
 
   docClient
-    .scan({
+    .query({
       TableName: c.shortUrl_table,
       IndexName: c.user_index,
       FilterExpression: '#user = :user',
@@ -125,6 +142,7 @@ router.get('/user/', async (req: Request, res: Response) => {
         '#user': 'user',
       },
       Limit: 10,
+      ScanIndexForward: false,
     })
     .promise()
     .then((result) => res.status(200).send(JSON.stringify(result)))

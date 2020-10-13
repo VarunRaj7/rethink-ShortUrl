@@ -19,14 +19,22 @@ function createDynamoDBClient() {
   return new AWS.DynamoDB.DocumentClient();
 }
 
-async function actualUrlExists(actualUrl: string, docClient: DocumentClient) {
+async function actualUrlExists(
+  actualUrl: string,
+  user: string,
+  docClient: DocumentClient
+) {
   const result = await docClient
     .query({
       TableName: c.shortUrl_table,
       IndexName: c.actualUrl_index,
-      KeyConditionExpression: 'actualUrl = :actualUrl',
+      KeyConditionExpression: 'actualUrl = :actualUrl AND #user = :user',
+      ExpressionAttributeNames: {
+        '#user': 'user',
+      },
       ExpressionAttributeValues: {
         ':actualUrl': actualUrl,
+        ':user': user,
       },
     })
     .promise();
