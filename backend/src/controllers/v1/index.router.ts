@@ -24,7 +24,7 @@ router.get('/shortUrl/:actualUrl', async (req: Request, res: Response) => {
     .toString()
     .replace(/\/$/, '');
 
-  const user = 'Varun';
+  const user = 'Rethink';
 
   logger.info(`ShortURL for ${actualUrl}`);
 
@@ -49,7 +49,7 @@ router.get('/shortUrl/:actualUrl', async (req: Request, res: Response) => {
     const newItem: shortUrlModel = {
       actualUrl: actualUrl,
       shortUrl: ShortUrl,
-      user: 'Varun',
+      user: 'Rethink',
       createdAt: new Date().toISOString(),
     };
 
@@ -103,9 +103,8 @@ router.get('/actualUrl/:shortUrl', async (req: Request, res: Response) => {
 });
 
 // Delete short URL
-/*
-router.delete('/shortUrl/', async (req: Request, res: Response) => {
-  const { shortUrl } = req.body;
+router.delete('/shortUrl/:shortUrl', async (req: Request, res: Response) => {
+  const shortUrl = decodeURI(req.params.shortUrl).toString();
 
   logger.info(`Deleting Short URL ${shortUrl}`);
 
@@ -120,12 +119,11 @@ router.delete('/shortUrl/', async (req: Request, res: Response) => {
     .then(() => res.status(200).send(`Successfully Deleted ${shortUrl}`))
     .catch((e) => res.status(400).send(`Failed to delete retry: ${e}`));
 });
-*/
 
 // Fetch the latest 10 urls created by user
 
 router.get('/user/', async (req: Request, res: Response) => {
-  const user = 'Varun';
+  const user = 'Rethink';
 
   // Fecthing the last 10 urls created by user
   logger.info(`ShortURL exists for ${user}`);
@@ -134,7 +132,7 @@ router.get('/user/', async (req: Request, res: Response) => {
     .query({
       TableName: c.shortUrl_table,
       IndexName: c.user_index,
-      FilterExpression: '#user = :user',
+      KeyConditionExpression: '#user = :user',
       ExpressionAttributeValues: {
         ':user': user,
       },
