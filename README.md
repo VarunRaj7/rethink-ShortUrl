@@ -1,6 +1,6 @@
 ### Short URL
 
-The problem of generating short url and unique url is solved by generating a unique id of 8 characters for each actual url and given http://www.shorturl.com/{uinqueId}. A unique Id is generated using the nano url which has the following limitations for the 8 characters:
+The problem of generating short url and unique url is solved by generating a unique id of 8 characters for each actual url and given http://www.shorturl.com/{uinqueId}. A unique Id is generated using the **nanourl** npm package which has the following limitations for the 8 characters:
 
 1. There are ~281 trillion unique possiblities for the [a-z], [A-Z], and [0-9] (total 64 characters)
 2. These have the 1% probablility of at least one collision for 87 days as calculated [here](https://zelark.github.io/nano-id-cc/).
