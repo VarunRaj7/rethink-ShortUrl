@@ -46,15 +46,19 @@ The actualUrl and user are the Global Secondary indexes.
 
    `$ npm run dev`
 
+**NOTE: You should have an AWS DynamoDB Service running and must have the required configurations that are listed on config/config.ts to run on your local machine**
+
 ### Deploying to the AWS Elastic Beanstalk
 
 1. Install EB CLI and configure with your aws credentials as shown [here](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html).
 
-2. Create an EB environment using:
+2. Add the required configurations in the .ebextensions/dummy-environment.config.
+
+3. Create an EB environment using:
 
    `$ eb create`
 
-3. Deploy the service using:
+4. Deploy the service using:
 
    `$ eb deploy`
 
