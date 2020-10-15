@@ -20,10 +20,9 @@ import {
 } from '@material-ui/core';
 import SendIcon from '@material-ui/icons/Send';
 import { makeStyles } from '@material-ui/core/styles';
-// import './App.css';
 import { apiEndpoint } from './config';
 import axios from 'axios';
-import { shortUrlModel } from './shortUrl.mode';
+import { shortUrlModel } from './shortUrl.model';
 import DeleteIcon from '@material-ui/icons/Delete';
 import moment from 'moment';
 
@@ -121,6 +120,7 @@ function App() {
     })();
   }, []);
 
+  // delete click handler
   async function delClickHandler(shortUrl: string) {
     await axios.delete(
       apiEndpoint + '/api/v1/shortUrl/' + encodeURIComponent(shortUrl)
@@ -133,6 +133,7 @@ function App() {
     })();
   }
 
+  // handling the send button click
   async function handleClick() {
     console.log(`${link}`);
     const resp1 = await axios.get(
