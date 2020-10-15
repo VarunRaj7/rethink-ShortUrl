@@ -1,5 +1,33 @@
 ### Short-Url Backend
 
+The backend consists of 4 apis as follows:
+
+1. GET {elastic_beanstalk_endpoint}/api/v1/shortUrl/:actualUrl
+
+   {
+   // shortUrl Model Object
+   }
+
+2. GET {elastic_beanstalk_endpoint}/api/v1/actualUrl/:shortUrl
+
+   {
+   // shortUrl Model Object
+   }
+
+3. GET {elastic_beanstalk_endpoint}/api/v1/user/
+
+   An array of shortUrl Model Objects
+
+4. DELETE {elastic_beanstalk_endpoint}/api/v1/shortUrl/:shortUrl
+
+   Deletes and gives back a status 200 on successfull response
+
+The database in the backend is the dynamoDB, with columns:
+
+shortUrl, actualUrl, user, and createdAt.
+
+The actualUrl and user are the Global Secondary indexes.
+
 ### How to use?
 
 1. Clone the project locally:
@@ -55,3 +83,9 @@
 Some more resources on ESlint and prettier:
 
 [Youtube](https://www.youtube.com/watch?v=SydnKbGc7W8)
+
+Special packages:
+
+1. aws-sdk
+2. nanoid
+3. is-url

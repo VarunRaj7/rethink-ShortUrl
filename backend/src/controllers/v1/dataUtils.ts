@@ -6,6 +6,7 @@ import { createLogger } from '../../utils/logger';
 const logger = createLogger('Datautils');
 const c = config.dev;
 
+// Create and Return a DynamoDB Client
 function createDynamoDBClient() {
   if (process.env.IS_OFFLINE) {
     logger.info('Creating a local DynamoDB instance');
@@ -19,6 +20,7 @@ function createDynamoDBClient() {
   return new AWS.DynamoDB.DocumentClient();
 }
 
+// Check if the actual url exists
 async function actualUrlExists(
   actualUrl: string,
   user: string,

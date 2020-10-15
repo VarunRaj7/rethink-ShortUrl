@@ -2,8 +2,8 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import isUrl from 'is-url';
 import Axios, { AxiosResponse } from 'axios';
-import { shortUrlModel } from '../src/controllers/v1/shortUrl.model';
-import { createLogger } from '../src/utils/logger';
+import { shortUrlModel } from '../controllers/v1/shortUrl.model';
+import { createLogger } from '../utils/logger';
 
 const logger = createLogger('testing');
 const google = 'https://www.google.com/';
