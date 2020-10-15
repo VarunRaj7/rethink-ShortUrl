@@ -13,13 +13,17 @@ The backend consists of 4 apis as follows:
 1. GET {elastic_beanstalk_endpoint}/api/v1/shortUrl/:actualUrl
 
    {
+
    // shortUrl Model Object
+
    }
 
 2. GET {elastic_beanstalk_endpoint}/api/v1/actualUrl/:shortUrl
 
    {
+
    // shortUrl Model Object
+
    }
 
 3. GET {elastic_beanstalk_endpoint}/api/v1/user/
@@ -36,6 +40,6 @@ shortUrl, actualUrl, user, and createdAt.
 
 The actualUrl and user are the Global Secondary indexes.
 
-Elastic Beanstalk api endpoint: http://rethink-shorturl-dev.us-east-2.elasticbeanstalk.com/
+Elastic Beanstalk api [endpoint](http://rethink-shorturl-dev.us-east-2.elasticbeanstalk.com/)
 
-The application is also hosted on AWS S3 [here](http://rethink-short-url.s3-website.us-east-2.amazonaws.com)
+The application is also hosted on AWS S3: http://rethink-short-url.s3-website.us-east-2.amazonaws.com
